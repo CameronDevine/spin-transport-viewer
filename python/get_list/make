@@ -1,0 +1,5 @@
+rm get_list.zip
+pip download pymysql
+unzip PyMySQL*
+zip -r get_list.zip *.py pymysql
+rm -r pymysql PyMySQL*
