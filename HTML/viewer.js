@@ -117,6 +117,14 @@ request_data = function(date){
 		});
 };
 
+max2d = function(arr) {
+	return Math.max.apply(Math, [].concat.apply([], arr));
+}
+
+min2d = function(arr) {
+	return Math.min.apply(Math, [].concat.apply([], arr));
+}
+
 plot_data = function(){
 	console.log('plot_data');
 	Plotly.purge('plot');
@@ -127,21 +135,19 @@ plot_data = function(){
 	rho3 = JSON.parse(data['rho3']);
 	x = JSON.parse(data['x']);
 	t = JSON.parse(data['t']);
-	var max_array = new Array();
-	var min_array = new Array();
-	rho1.concat(rho2).concat(rho3).forEach(function(ell){max_array.push(Math.max.apply(null, ell))})
-	rho1.concat(rho2).concat(rho3).forEach(function(ell){min_array.push(Math.min.apply(null, ell))})
-	var data_max = Math.max.apply(null, max_array);
-	var data_min = Math.min.apply(null, min_array);
-	var x_max = Math.max.apply(null, x);
-	var x_min = Math.min.apply(null, x);
+	var x_max = Math.max.apply(Math, x);
+	var x_min = Math.min.apply(Math, x);
 	Plotly.plot('plot', [
 		{x: x, y: rho1[0], name: 'rho1'},
-		{x: x, y: rho2[0], name: 'rho2'},
-		{x: x, y: rho3[0], name: 'rho3'}
+		{x: x, y: rho2[0], name: 'rho2', xaxis: 'x2', yaxis: 'y2'},
+		{x: x, y: rho3[0], name: 'rho3', xaxis: 'x3', yaxis: 'y3'}
 	], {
 		xaxis: {range: [x_min, x_max]},
-		yaxis: {range: [data_min, data_max]}
+		yaxis: {range: [min2d(rho1), max2d(rho1)], domain: [0.717, 1]},
+		xaxis2: {range: [x_min, x_max], anchor: 'y2'},
+		yaxis2: {range: [min2d(rho2), max2d(rho2)], domain: [0.383, 0.617]},
+		xaxis3: {range: [x_min, x_max], anchor: 'y3'},
+		yaxis3: {range: [min2d(rho3), max2d(rho3)], domain: [0, 0.283]}
 	});
 	requestAnimationFrame(update_plot);
 };
@@ -150,9 +156,9 @@ update_plot = function(){
 	n += 1;
 	Plotly.animate('plot', {
 		data: [
-			{x: x, y: rho1[n]},
-			{x: x, y: rho2[n]},
-			{x: x, y: rho3[n]}
+			{y: rho1[n]},
+			{y: rho2[n]},
+			{y: rho3[n]}
 		]}, {
 			transition: {duration: 0},
 			frame: {duration: 50, redraw: false}
